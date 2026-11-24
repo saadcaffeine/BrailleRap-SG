@@ -1,0 +1,54 @@
+diff --git a/Marlin/Configuration.h b/Marlin/Configuration.h
+index 70c356dd4e..b7daa56546 100644
+--- a/Marlin/Configuration.h
++++ b/Marlin/Configuration.h
+@@ -121,7 +121,7 @@
+  * Currently Ethernet (-2) is only supported on Teensy 4.1 boards.
+  * :[-2, -1, 0, 1, 2, 3, 4, 5, 6, 7]
+  */
+-//#define SERIAL_PORT_2 -1
++#define SERIAL_PORT_2 -1
+ //#define BAUDRATE_2 250000   // :[2400, 9600, 19200, 38400, 57600, 115200, 250000, 500000, 1000000] Enable to override BAUDRATE
+ 
+ /**
+@@ -1161,7 +1161,7 @@
+  * Override with M92
+  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
+  */
+-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 87/2, 400, 500 }
++#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 43.5, 400, 500 }  // Y: 87/2 was integer division (=43)
+ 
+ /**
+  * Default Max Feed Rate (linear=mm/s, rotational=°/s)
+diff --git a/Marlin/Configuration_adv.h b/Marlin/Configuration_adv.h
+index 5d04530232..3af6d2745d 100644
+--- a/Marlin/Configuration_adv.h
++++ b/Marlin/Configuration_adv.h
+@@ -4146,12 +4146,12 @@
+  * WiFi Support (Espressif ESP32 WiFi)
+  */
+ //#define WIFISUPPORT         // Marlin embedded WiFi managenent
+-//#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)
++#define ESP3D_WIFISUPPORT   // ESP3D Library WiFi management (https://github.com/luc-github/ESP3DLib)
+ 
+ #if EITHER(WIFISUPPORT, ESP3D_WIFISUPPORT)
+   #define WEBSUPPORT          // Start a webserver (which may include auto-discovery)
+   #define OTASUPPORT          // Support over-the-air firmware updates
+-  //#define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
++  #define WIFI_CUSTOM_COMMAND // Accept feature config commands (e.g., WiFi ESP3D) from the host
+ 
+   /**
+    * To set a default WiFi SSID / Password, create a file called Configuration_Secure.h with
+diff --git a/ini/features.ini b/ini/features.ini
+index 5960741bfe..4c02c2282f 100644
+--- a/ini/features.ini
++++ b/ini/features.ini
+@@ -237,7 +237,7 @@ IS_SCARA                               = build_src_filter=+<src/module/scara.cpp
+ HAS_SERVOS                             = build_src_filter=+<src/module/servo.cpp> +<src/gcode/control/M280.cpp>
+ MORGAN_SCARA                           = build_src_filter=+<src/gcode/scara>
+ HAS_MICROSTEPS                         = build_src_filter=+<src/gcode/control/M350_M351.cpp>
+-(ESP3D_)?WIFISUPPORT                   = AsyncTCP, ESP Async WebServer
++(ESP3D_)?WIFISUPPORT                   = me-no-dev/AsyncTCP@1.1.1, me-no-dev/ESP Async WebServer@1.2.3
+                                          ESP3DLib=https://github.com/luc-github/ESP3DLib/archive/dc0f3d96c6.zip
+                                          arduinoWebSockets=links2004/WebSockets@2.3.4
+                                          luc-github/ESP32SSDP@1.1.1
