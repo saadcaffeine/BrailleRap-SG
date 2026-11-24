@@ -8,6 +8,9 @@ from the ESP3D web interface over WiFi.
 
 ## Base
 
+Firmware fork with these changes committed: [saadcaffeine/MarlinBraille2](https://github.com/saadcaffeine/MarlinBraille2/tree/xl-sg), branch `xl-sg`.
+To build from it directly: `git clone -b xl-sg https://github.com/saadcaffeine/MarlinBraille2.git`.
+
 - Firmware source: [braillerap/MarlinBraille2](https://github.com/braillerap/MarlinBraille2),
   branch `BrailleRAP`, commit `0673683ef0` (Marlin 2.1.1.2)
 - Board config started from [braillerap/MarlinBraille2Configuration](https://github.com/braillerap/MarlinBraille2Configuration)
