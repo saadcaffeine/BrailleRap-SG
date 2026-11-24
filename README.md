@@ -22,6 +22,11 @@ BrailleRAP now exist in 2 different sizes: **BrailleRAP** and **BrailleRAP XL**.
 
 You may also find some interest in [OpenStreetTangible](https://github.com/braillerap/OpenStreetTangible), a tangible subway map of the Rennes city in France. A custom build to demonstrate the ability of OpenStreetTouch and BrailleRAP to build accessible map.
 
+## Singapore build (BrailleRAP XL SG)
+
+This fork documents the Singapore BrailleRAP XL, running on an **MKS TinyBee v1.0** (ESP32) with WiFi through ESP3D.
+The firmware configuration, the changes from upstream, wiring notes and build/flash steps are in [`MarlinBraille2-TinyBee-XL/`](MarlinBraille2-TinyBee-XL/README.md).
+
 ## OSHWA Certification
 
 BrailleRAP is [OSHWA](https:oshwa.org) open source hardware certified.
