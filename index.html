@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BrailleRAP Singapore: open-source Braille embossers, made locally</title>
+<meta name="description" content="BrailleRAP and BrailleRAP XL: open-source Braille embossers built and supported in Singapore. Emboss Braille, maps and drawings from any WiFi device, phone or desktop.">
+<meta property="og:title" content="BrailleRAP Singapore">
+<meta property="og:description" content="Open-source Braille embossers, built and supported in Singapore. Print from any phone over WiFi.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 30'%3E%3Ccircle cx='5' cy='5' r='3.4' fill='%23E2232F'/%3E%3Ccircle cx='5' cy='15' r='3.4' fill='%231B1F2A'/%3E%3Ccircle cx='15' cy='5' r='3.4' fill='%231B1F2A'/%3E%3Ccircle cx='15' cy='25' r='3.4' fill='%231B1F2A'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,300;0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #EDEFEC;
+  --sheet: #FFFFFF;
+  --ink: #1B1F2A;
+  --graphite: #59606E;
+  --rule: #CDD1CB;
+  --red: #E2232F;
+  --red-ink: #B3121D;
+  --measure: 36rem;
+  --font: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 1.125rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--red-ink); }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 3px; border-radius: 2px; }
+img, svg { display: block; max-width: 100%; }
+.wrap { width: min(72rem, 100% - 3rem); margin-inline: auto; }
+.skip { position: absolute; left: -999px; }
+.skip:focus { left: 1rem; top: 1rem; background: var(--sheet); padding: .5rem 1rem; z-index: 10; }
+
+/* type scale (1.25) */
+h1, h2, h3 { margin: 0; line-height: 1.08; font-weight: 800; letter-spacing: -0.02em; }
+h1 { font-size: clamp(2.5rem, 5.4vw, 4.25rem); max-width: 14ch; }
+h2 { font-size: clamp(2rem, 4.2vw, 3.05rem); }
+h3 { font-size: 1.4rem; letter-spacing: -0.01em; line-height: 1.2; }
+p { margin: 0; max-width: var(--measure); }
+.lede { font-size: clamp(1.2rem, 1.8vw, 1.4rem); font-weight: 300; line-height: 1.5; color: inherit; }
+.muted { color: var(--graphite); }
+
+/* buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: .6rem;
+  padding: .95rem 1.4rem; border-radius: 999px;
+  background: var(--red); color: #fff; text-decoration: none;
+  font-weight: 600; font-size: 1.05rem; line-height: 1;
+  transition: background .15s ease;
+}
+.btn:hover { background: var(--red-ink); color: #fff; }
+.btn--quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.btn--quiet:hover { background: var(--ink); color: var(--paper); }
+
+/* header */
+.top { padding: 1.4rem 0; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand { display: flex; align-items: center; gap: .7rem; text-decoration: none; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.01em; }
+.brand svg { width: 18px; height: 27px; }
+.top nav { display: flex; gap: 1.6rem; align-items: center; font-size: 1rem; }
+.top nav a { text-decoration: none; }
+.top nav a:hover { text-decoration: underline; }
+@media (max-width: 760px) { .top nav .navlink { display: none; } }
+
+/* hero */
+.hero { padding: 2rem 0 5rem; }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+.hero-copy { display: grid; gap: 1.6rem; }
+.hero-copy .actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: .4rem; }
+.facts { display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; margin: .4rem 0 0; padding: 0; list-style: none; font-size: 1rem; color: var(--graphite); }
+.facts li { display: flex; gap: .5rem; align-items: center; }
+.facts li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
+
+.sheet-stage { position: relative; }
+.sheet {
+  background: var(--sheet);
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(27,31,42,.06), 0 24px 48px -24px rgba(27,31,42,.35);
+  aspect-ratio: 297 / 420;
+  width: min(100%, 27rem);
+  margin-inline: auto;
+  position: relative;
+  overflow: hidden;
+}
+.sheet svg { width: 100%; height: 100%; }
+.sheet-caption { text-align: center; font-size: .95rem; color: var(--graphite); margin: 1rem auto 0; }
+.dot { fill: var(--ink); }
+.dot.is-fresh { fill: var(--red); }
+.carriage { fill: rgba(27,31,42,.07); }
+.head { fill: var(--red); }
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .sheet { width: min(100%, 22rem); }
+}
+
+/* sections */
+section { padding: clamp(4rem, 9vw, 7.5rem) 0; }
+.section-head { display: grid; gap: 1.1rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.band-ink { background: var(--ink); color: #F3F4F1; }
+.band-ink .muted { color: #AEB4C0; }
+.band-ink a:hover { color: #FF6B73; }
+.band-sheet { background: var(--sheet); }
+
+/* wifi */
+.wifi .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+.steps { list-style: none; margin: 2.2rem 0 0; padding: 0; display: grid; gap: 1.4rem; counter-reset: step; max-width: var(--measure); }
+.steps li { display: grid; grid-template-columns: 2.6rem 1fr; gap: 1rem; align-items: start; counter-increment: step; }
+.steps li::before {
+  content: counter(step);
+  width: 2.6rem; height: 2.6rem; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1.5px solid currentColor; font-weight: 600;
+}
+.steps strong { display: block; font-weight: 600; }
+.phone {
+  width: min(100%, 20rem); margin-inline: auto;
+  background: #0F1219; border-radius: 2.6rem; padding: .8rem;
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,.6);
+}
+.screen { background: #fff; color: #1b2a3a; border-radius: 2rem; overflow: hidden; padding: 1.4rem 1.1rem 1.2rem; font-size: .8rem; line-height: 1.35; }
+.screen .app-title { display: flex; align-items: center; gap: .5rem; font-weight: 800; font-size: 1rem; color: #1d3557; }
+.screen .app-title .gear { margin-left: auto; width: 18px; height: 18px; border-radius: 50%; border: 3px dotted #1d3557; }
+.leds { display: flex; flex-wrap: wrap; gap: .35rem .8rem; margin: .8rem 0 .9rem; font-size: .66rem; font-weight: 600; color: #445; }
+.leds span { display: inline-flex; align-items: center; gap: .3rem; }
+.leds i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.g { background: #2fbf4a; } .a { background: #f2a516; } .b { background: #2f7de0; } .x { background: #c9ccd1; }
+.field { border: 1px solid #c4c8ce; border-radius: .4rem; padding: .55rem .6rem; min-height: 3.6rem; color: #1d3557; }
+.preview { margin-top: .6rem; border: 2px solid #f2a516; border-radius: .4rem; padding: .5rem .55rem; min-height: 3.2rem; background: #fff8ea; }
+.preview svg { width: 100%; height: auto; }
+.app-buttons { display: flex; gap: .4rem; margin: .8rem 0 .6rem; align-items: center; }
+.app-buttons span { font-size: .66rem; font-weight: 600; padding: .45rem .55rem; border-radius: .3rem; background: #e3e6ea; color: #9aa1aa; }
+.app-buttons .cancel { background: #fff; color: #d32f2f; box-shadow: inset 0 0 0 1px #d32f2f; }
+.app-buttons .estop { margin-left: auto; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: #f5c400; display: grid; place-items: center; padding: 0; }
+.app-buttons .estop::after { content: ""; width: 1.3rem; height: 1.3rem; border-radius: 50%; background: #d62218; }
+.stage-bar { display: flex; gap: 3px; height: 13px; margin-top: .4rem; }
+.stage-bar span { border-radius: 2px; }
+.stage-bar .s1 { flex: 1; background: #8e6cd1; }
+.stage-bar .s2 { flex: 1; background: #1f9bb0; }
+.stage-bar .s3 { flex: 3; background: linear-gradient(90deg, #2fbf4a 0 46%, #e6e8ec 46%); }
+@media (max-width: 860px) { .wifi .wrap { grid-template-columns: 1fr; } .phone { order: 2; } }
+
+/* machines */
+.machines .grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+.sizes svg { width: 100%; max-width: 30rem; margin-inline: auto; }
+.sizes text { font-family: var(--font); }
+.machine-list { display: grid; gap: 2.6rem; }
+.machine { display: grid; gap: .7rem; padding-top: 1.4rem; border-top: 2px solid var(--ink); }
+.machine dl { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1.2rem; margin: .4rem 0 0; font-size: 1rem; }
+.machine dt { color: var(--graphite); }
+.machine dd { margin: 0; font-weight: 600; }
+@media (max-width: 860px) { .machines .grid { grid-template-columns: 1fr; } }
+
+/* software */
+.software .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2rem, 5vw, 4rem); }
+.app { display: grid; gap: 1rem; align-content: start; }
+.app figure { margin: 0 0 .6rem; background: var(--paper); border-radius: 6px; padding: 1.4rem; }
+.app figure svg { width: 100%; height: auto; }
+.app ul { margin: .2rem 0 0; padding-left: 1.1rem; display: grid; gap: .35rem; max-width: var(--measure); }
+.app .links { font-size: 1rem; }
+@media (max-width: 760px) { .software .grid { grid-template-columns: 1fr; } }
+
+/* art */
+.art .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+.artboard { background: var(--sheet); border-radius: 3px; aspect-ratio: 1; box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); }
+.artboard svg { width: 100%; height: 100%; }
+@media (max-width: 860px) { .art .wrap { grid-template-columns: 1fr; } }
+
+/* open */
+.open-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 3.5rem); margin: 0; }
+.open-list > div { border-top: 2px solid var(--ink); padding-top: 1.2rem; display: grid; gap: .7rem; align-content: start; }
+.open-list dt { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.01em; line-height: 1.2; }
+.open-list dd { margin: 0; }
+.licence { margin-top: clamp(2.5rem, 5vw, 4rem); display: flex; flex-wrap: wrap; gap: 1rem 2.5rem; font-size: 1rem; color: var(--graphite); }
+@media (max-width: 860px) { .open-list { grid-template-columns: 1fr; } }
+
+/* order */
+.order { text-align: left; }
+.order .wrap { display: grid; gap: 1.6rem; }
+.order h2 { font-size: clamp(2.4rem, 5.5vw, 4.2rem); max-width: 16ch; }
+.mail { font-size: clamp(1.5rem, 3.6vw, 2.5rem); font-weight: 800; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.mail a { text-decoration-thickness: 3px; text-underline-offset: 6px; text-decoration-color: var(--red); }
+.order .actions { display: flex; flex-wrap: wrap; gap: .8rem; }
+
+footer { padding: 2.5rem 0 3rem; font-size: .95rem; color: var(--graphite); border-top: 1px solid var(--rule); }
+footer .wrap { display: grid; gap: .8rem; }
+footer p { max-width: 60rem; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="BrailleRAP Singapore, home">
+      <svg viewBox="0 0 20 30" aria-hidden="true"><circle cx="5" cy="5" r="3.4" fill="#E2232F"/><circle cx="5" cy="15" r="3.4" fill="#1B1F2A"/><circle cx="15" cy="5" r="3.4" fill="#1B1F2A"/><circle cx="15" cy="25" r="3.4" fill="#1B1F2A"/></svg>
+      BrailleRAP Singapore
+    </a>
+    <nav aria-label="Sections">
+      <a class="navlink" href="#wifi">WiFi printing</a>
+      <a class="navlink" href="#machines">Machines</a>
+      <a class="navlink" href="#software">Software</a>
+      <a class="navlink" href="#open">Open source</a>
+      <a class="btn btn--quiet" href="#order">Order</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title" style="padding-top:2rem">
+    <div class="wrap">
+      <div class="hero-copy">
+        <h1 id="hero-title">Braille embossers, built and supported in Singapore.</h1>
+        <p class="lede">BrailleRAP embosses Braille, maps and drawings onto ordinary paper. Send a page from your phone over WiFi, or from a desktop app on your computer. It's fully open source, so it's made here, fixed here and costs far less.</p>
+        <div class="actions">
+          <a class="btn" href="mailto:saad@salvage.garden?subject=BrailleRAP%20purchase%20order">Email for a purchase order</a>
+          <a class="btn btn--quiet" href="#wifi">See how it works</a>
+        </div>
+        <ul class="facts" aria-label="Key facts">
+          <li>A4 and A3 models</li>
+          <li>Works with any WiFi device</li>
+          <li>OSHWA-certified open hardware</li>
+        </ul>
+      </div>
+      <div class="sheet-stage">
+        <div class="sheet" role="img" aria-label="An A3 sheet being embossed: Braille reading BrailleRAP Singapore, followed by a tactile flower drawing made of raised dots.">
+          <svg id="hero-sheet" viewBox="0 0 297 420" aria-hidden="true">
+            <rect class="carriage" id="carriage" x="0" y="0" width="297" height="9" opacity="0"/>
+            <circle class="head" id="head" cx="-10" cy="-10" r="2.2"/>
+            <g id="hero-dots"></g>
+          </svg>
+        </div>
+        <p class="sheet-caption">An A3 sheet on the BrailleRAP XL, drawn to scale: Braille text and a tactile drawing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="wifi" class="wifi band-ink" aria-labelledby="wifi-title">
+    <div class="wrap">
+      <div>
+        <div class="section-head" style="margin-bottom:0">
+          <h2 id="wifi-title">Print from the phone in your pocket.</h2>
+          <p class="lede">The embosser runs its own WiFi network with a print page built in. Any phone, tablet or laptop with a browser can use it, with no app to install and no account to create.</p>
+        </div>
+        <ol class="steps">
+          <li><div><strong>Join the embosser's WiFi</strong><span class="muted">It appears like any other network on your phone.</span></div></li>
+          <li><div><strong>Open the print page</strong><span class="muted">Type 192.168.0.1/braille.html into the browser.</span></div></li>
+          <li><div><strong>Type your text</strong><span class="muted">It's translated to English Braille (UEB), with a live preview of every dot.</span></div></li>
+          <li><div><strong>Press Print</strong><span class="muted">The page goes to the embosser's SD card, so printing keeps going even if your phone sleeps. Status lights and a progress bar show homing, paper loading and embossing.</span></div></li>
+        </ol>
+      </div>
+      <div class="phone" role="img" aria-label="A phone showing the BrailleRAP print page: status lights, a text box reading Hello Singapore, a Braille preview, and a progress bar halfway through embossing.">
+        <div class="screen" aria-hidden="true">
+          <div class="app-title"><svg width="12" height="18" viewBox="0 0 20 30"><circle cx="5" cy="5" r="3.4" fill="#1d3557"/><circle cx="5" cy="15" r="3.4" fill="#1d3557"/><circle cx="15" cy="5" r="3.4" fill="#1d3557"/><circle cx="15" cy="25" r="3.4" fill="#1d3557"/></svg>BRAILLERAP SG<span class="gear"></span></div>
+          <div class="leds"><span><i class="g"></i>LINK</span><span><i class="b"></i>SD</span><span><i class="a"></i>X STOP</span><span><i class="g"></i>PAPER</span><span><i class="x"></i>POWER</span></div>
+          <div class="field">Hello Singapore</div>
+          <div class="preview"><svg id="phone-preview" viewBox="0 0 170 22"></svg></div>
+          <div class="app-buttons"><span>GENERATE</span><span>PRINT</span><span class="cancel">CANCEL</span><span class="estop"></span></div>
+          <div style="font-size:.7rem">Embossing 41/88 dots</div>
+          <div class="stage-bar"><span class="s1"></span><span class="s2"></span><span class="s3"></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="machines" class="machines" aria-labelledby="machines-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="machines-title">Two sizes, same open design.</h2>
+        <p class="lede">Choose the compact BrailleRAP for Braille text on A4, or the BrailleRAP XL for large tactile graphics on A3.</p>
+      </div>
+      <div class="grid">
+        <figure class="sizes" style="margin:0">
+          <svg viewBox="0 0 330 470" role="img" aria-labelledby="sizes-title sizes-desc">
+            <title id="sizes-title">Sheet sizes to scale</title>
+            <desc id="sizes-desc">An A4 sheet, 210 by 297 millimetres, sits inside an A3 sheet, 297 by 420 millimetres.</desc>
+            <rect x="16" y="16" width="297" height="420" fill="#fff" stroke="#1B1F2A" stroke-width="1.4"/>
+            <rect x="16" y="139" width="210" height="297" fill="#EDEFEC" stroke="#E2232F" stroke-width="1.4"/>
+            <text x="28" y="40" font-size="13" font-weight="600" fill="#1B1F2A">BrailleRAP XL, A3</text>
+            <text x="28" y="57" font-size="11" fill="#59606E">297 × 420 mm</text>
+            <text x="28" y="162" font-size="13" font-weight="600" fill="#B3121D">BrailleRAP, A4</text>
+            <text x="28" y="179" font-size="11" fill="#59606E">210 × 297 mm</text>
+            <g id="size-dots" aria-hidden="true"></g>
+          </svg>
+        </figure>
+        <div class="machine-list">
+          <article class="machine" aria-labelledby="m1">
+            <h3 id="m1">BrailleRAP</h3>
+            <p>Light enough to carry between classrooms, and small enough for an airline cabin case. It's ideal for worksheets, labels, menus and everyday Braille.</p>
+            <dl><dt>Paper</dt><dd>Up to A4, 210 × 297 mm</dd><dt>Weight</dt><dd>Under 5 kg</dd></dl>
+          </article>
+          <article class="machine" aria-labelledby="m2">
+            <h3 id="m2">BrailleRAP XL</h3>
+            <p>Twice the area for maps, diagrams, floor plans and artwork, while still embossing standard Braille alongside them.</p>
+            <dl><dt>Paper</dt><dd>Up to A3, 297 × 420 mm</dd><dt>Weight</dt><dd>About 7.5 kg</dd></dl>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="software" class="software band-sheet" aria-labelledby="software-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="software-title">Desktop software for documents and drawings.</h2>
+        <p class="lede">Two free apps for Windows and Linux go further than the phone page. Both translate with LibLouis, the open Braille library used by screen readers worldwide.</p>
+      </div>
+      <div class="grid">
+        <article class="app" aria-labelledby="a1">
+          <figure aria-hidden="true">
+            <svg viewBox="0 0 300 120"><g font-family="Atkinson Hyperlegible Next, sans-serif" font-size="13" fill="#59606E"><text x="0" y="22">English: hello</text><text x="0" y="62">Melayu: selamat</text><text x="0" y="102">Numbers: 2026</text></g><g id="lang-dots"></g></svg>
+          </figure>
+          <h3 id="a1">AccessBrailleRAP: text and documents</h3>
+          <p>Type text or open a document, pick a Braille standard and emboss. It's designed for accessibility first, and tested with the NVDA screen reader.</p>
+          <ul>
+            <li>200 Braille standards, including tables for English, Chinese, Malay and Tamil</li>
+            <li>Imports text from office documents</li>
+            <li>Interface available in 9 languages</li>
+          </ul>
+          <p class="links"><a href="https://github.com/braillerap/AccessBrailleRAP">AccessBrailleRAP on GitHub</a></p>
+        </article>
+        <article class="app" aria-labelledby="a2">
+          <figure aria-hidden="true">
+            <svg viewBox="0 0 300 120"><path id="vector-line" d="M10 95 C 50 20, 90 20, 120 60 S 170 110, 200 50 S 260 10, 290 40" fill="none" stroke="#C3C7CF" stroke-width="1.2" stroke-dasharray="3 3"/><g id="vector-dots"></g><g id="fill-dots"></g></svg>
+          </figure>
+          <h3 id="a2">DesktopBrailleRAP: images and illustrations</h3>
+          <p>Import any SVG drawing and turn it into something you can feel. Lines become rows of raised dots, and colours become tactile textures, with Braille labels placed anywhere on the page.</p>
+          <ul>
+            <li>Dots follow vector paths and outlines</li>
+            <li>Fill and stroke colours map to dot patterns</li>
+            <li>Scale, rotate, align and preview before embossing</li>
+          </ul>
+          <p class="links"><a href="https://github.com/braillerap/DesktopBrailleRAP">DesktopBrailleRAP on GitHub</a></p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="art band-ink" aria-labelledby="art-title">
+    <div class="wrap">
+      <div class="artboard" role="img" aria-label="An embossed artwork: rings of raised dots spreading out from a point, like ripples on water.">
+        <svg id="art" viewBox="0 0 200 200" aria-hidden="true"></svg>
+      </div>
+      <div class="section-head" style="margin:0">
+        <h2 id="art-title">More than Braille.</h2>
+        <p class="lede">A dot is a mark you can see and touch. Artists, designers and students use BrailleRAP to make tactile prints, patterns and illustrations: work meant to be read by hand as much as by eye.</p>
+        <p class="muted">Every dot position is plain G-code, so you can also generate artwork with your own code and emboss it directly.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="open" class="open" aria-labelledby="open-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="open-title">Open source, from frame to firmware.</h2>
+        <p class="lede">Every drawing, part file and line of code is published. That's what makes it practical to build and support here, rather than import.</p>
+      </div>
+      <dl class="open-list">
+        <div><dt>Made locally</dt><dd>Laser-cut and 3D-printed parts with standard motors and electronics, fabricated and assembled in Singapore.</dd></div>
+        <div><dt>Supported locally</dt><dd>Repairs, spare parts, setup and training from people nearby, not from an overseas service centre. Nothing is locked or proprietary.</dd></div>
+        <div><dt>A fraction of the cost</dt><dd>An order of magnitude less than commercial Braille embossers, so a school or community group can afford more than one.</dd></div>
+      </dl>
+      <div class="licence">
+        <span>Certified open hardware: <a href="https://certification.oshwa.org/fr000027.html">OSHWA FR000027</a></span>
+        <span>Hardware licence: CERN-OHL-P v2</span>
+        <span>Design files: <a href="https://github.com/saadcaffeine/BrailleRap-SG">BrailleRap-SG on GitHub</a></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="order" class="order band-sheet" aria-labelledby="order-title">
+    <div class="wrap">
+      <h2 id="order-title">Bring a BrailleRAP to your school, library or studio.</h2>
+      <p class="lede">For purchase orders, quotes and demonstrations, email</p>
+      <p class="mail"><a href="mailto:saad@salvage.garden?subject=BrailleRAP%20purchase%20order">saad@salvage.garden</a></p>
+      <div class="actions">
+        <a class="btn" href="mailto:saad@salvage.garden?subject=BrailleRAP%20purchase%20order">Email for a purchase order</a>
+        <a class="btn btn--quiet" href="mailto:saad@salvage.garden?subject=BrailleRAP%20demonstration">Ask for a demonstration</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>BrailleRAP is an open-source Braille embosser created by the <a href="https://github.com/braillerap">BrailleRAP project</a>. This Singapore build uses MarlinBraille2 firmware on an MKS TinyBee board with ESP3D WiFi, AccessBrailleRAP, DesktopBrailleRAP and the BrailleRAP SG web interface, which is based on BrailleRapUI by Ondrej Kyjanek.</p>
+    <p>Source: <a href="https://github.com/saadcaffeine/BrailleRap-SG">hardware</a>, <a href="https://github.com/saadcaffeine/MarlinBraille2/tree/xl-sg">firmware</a>, <a href="https://github.com/saadcaffeine/BrailleRapSGUI">web interface</a>.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // UEB grade 1: letters, capitals (dot 6 per capital), digits with the numeric indicator
+  var L = {a:[1],b:[1,2],c:[1,4],d:[1,4,5],e:[1,5],f:[1,2,4],g:[1,2,4,5],h:[1,2,5],i:[2,4],j:[2,4,5],
+    k:[1,3],l:[1,2,3],m:[1,3,4],n:[1,3,4,5],o:[1,3,5],p:[1,2,3,4],q:[1,2,3,4,5],r:[1,2,3,5],s:[2,3,4],
+    t:[2,3,4,5],u:[1,3,6],v:[1,2,3,6],w:[2,4,5,6],x:[1,3,4,6],y:[1,3,4,5,6],z:[1,3,5,6]};
+  var D = {'1':'a','2':'b','3':'c','4':'d','5':'e','6':'f','7':'g','8':'h','9':'i','0':'j'};
+  function cells(text) {
+    var out = [], num = false;
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (c === ' ') { out.push([]); num = false; continue; }
+      if (D[c]) { if (!num) { out.push([3,4,5,6]); num = true; } out.push(L[D[c]]); continue; }
+      num = false;
+      var low = c.toLowerCase();
+      if (!L[low]) continue;
+      if (c !== low) out.push([6]);
+      out.push(L[low]);
+    }
+    return out;
+  }
+  // dot number -> column/row
+  var POS = {1:[0,0],2:[0,1],3:[0,2],4:[1,0],5:[1,1],6:[1,2]};
+  function brailleDots(text, x0, y0, pitch, cell) {
+    var pts = [];
+    cells(text).forEach(function (c, i) {
+      c.forEach(function (d) { pts.push([x0 + i * cell + POS[d][0] * pitch, y0 + POS[d][1] * pitch]); });
+    });
+    return pts;
+  }
+  function circle(g, x, y, r, cls) {
+    var el = document.createElementNS(NS, 'circle');
+    el.setAttribute('cx', x.toFixed(2)); el.setAttribute('cy', y.toFixed(2)); el.setAttribute('r', r);
+    if (cls) el.setAttribute('class', cls);
+    g.appendChild(el); return el;
+  }
+
+  // ---- hero: an A3 sheet in millimetres, embossed dot by dot ----------------
+  var heroG = document.getElementById('hero-dots');
+  var M = 22, DOT = 2.5, CELL = 6, LINE = 10;
+  var pts = [];
+  ['BrailleRAP', 'Singapore'].forEach(function (t, row) {
+    pts = pts.concat(brailleDots(t, M, M + row * LINE * 1.2, DOT, CELL));
+  });
+  // tactile drawing: a five-petal flower (rose curve) with stem and leaf, dots every ~2.6 mm
+  function along(fn, t0, t1, spacing) {
+    var res = [], prev = null, steps = 1200;
+    for (var k = 0; k <= steps; k++) {
+      var p = fn(t0 + (t1 - t0) * k / steps);
+      if (!prev || Math.hypot(p[0] - prev[0], p[1] - prev[1]) >= spacing) { res.push(p); prev = p; }
+    }
+    return res;
+  }
+  var cx = 148.5, cy = 205, R = 62;
+  pts = pts.concat(along(function (t) { var r = R * Math.cos(5 * t); return [cx + r * Math.cos(t), cy + r * Math.sin(t)]; }, 0, Math.PI, 2.8));
+  pts = pts.concat(along(function (t) { return [cx + 9 * Math.cos(t), cy + 9 * Math.sin(t)]; }, 0, 2 * Math.PI, 2.6));
+  pts = pts.concat(along(function (t) { return [cx + 3 * Math.sin(t * 2.4), cy + 12 + t * 168]; }, 0, 1, 2.8));
+  pts = pts.concat(along(function (t) { var a = t * Math.PI; return [cx + 2 + 44 * t, cy + 128 - 22 * t - 13 * Math.sin(a)]; }, 0, 1, 2.8));
+  pts = pts.concat(along(function (t) { var a = t * Math.PI; return [cx + 2 + 44 * t, cy + 128 - 22 * t + 9 * Math.sin(a)]; }, 0.04, 0.96, 2.8));
+  pts = pts.concat(along(function (t) { var a = t * Math.PI; return [cx - 2 - 36 * t, cy + 98 - 18 * t - 10 * Math.sin(a)]; }, 0, 1, 2.8));
+  pts = pts.concat(along(function (t) { var a = t * Math.PI; return [cx - 2 - 36 * t, cy + 98 - 18 * t + 7 * Math.sin(a)]; }, 0.05, 0.95, 2.8));
+  // emboss order: line by line, like the machine (paper moves in Y, carriage sweeps X)
+  pts.sort(function (p, q) { return Math.round(p[1] * 2) - Math.round(q[1] * 2) || p[0] - q[0]; });
+
+  var carriage = document.getElementById('carriage'), head = document.getElementById('head');
+  if (reduce) {
+    pts.forEach(function (p) { circle(heroG, p[0], p[1], 0.95, 'dot'); });
+  } else {
+    var i = 0, perFrame = 2, last = null;
+    carriage.setAttribute('opacity', '1');
+    var step = function () {
+      for (var n = 0; n < perFrame && i < pts.length; n++, i++) {
+        if (last) last.setAttribute('class', 'dot');
+        var p = pts[i];
+        last = circle(heroG, p[0], p[1], 0.95, 'dot is-fresh');
+        carriage.setAttribute('y', (p[1] - 4.5).toFixed(2));
+        head.setAttribute('cx', p[0].toFixed(2)); head.setAttribute('cy', (p[1] - 6).toFixed(2));
+      }
+      if (i < pts.length) { requestAnimationFrame(step); }
+      else {
+        if (last) last.setAttribute('class', 'dot');
+        carriage.setAttribute('opacity', '0'); head.setAttribute('cx', '-10');
+      }
+    };
+    setTimeout(function () { requestAnimationFrame(step); }, 450);
+  }
+
+  // ---- phone preview: "Hello Singapore" --------------------------------------
+  var pp = document.getElementById('phone-preview');
+  var phonePts = brailleDots('Hello Singapore', 2, 3, 2.6, 6.2);
+  phonePts.forEach(function (p, k) { var el = circle(pp, p[0], p[1], 1, ''); el.setAttribute('fill', k < 41 ? '#1b1f2a' : '#c4c8ce'); });
+  pp.setAttribute('viewBox', '0 0 ' + (phonePts.reduce(function (m, p) { return Math.max(m, p[0]); }, 0) + 3) + ' 11');
+
+  // ---- size comparison: Braille lines on the A4 sheet -----------------------
+  var sd = document.getElementById('size-dots');
+  ['worksheet', 'menu'].forEach(function (t, r) {
+    brailleDots(t, 30, 205 + r * 13, 2.5, 6).forEach(function (p) { circle(sd, p[0], p[1], 0.9).setAttribute('fill', '#1B1F2A'); });
+  });
+  for (var gx = 0; gx < 7; gx++) for (var gy = 0; gy < 5; gy++) {
+    var x = 240 + gx * 9, y = 300 + gy * 9;
+    if (Math.hypot(x - 267, y - 318) < 26) circle(sd, x, y, 1.1).setAttribute('fill', '#1B1F2A');
+  }
+
+  // ---- language samples ------------------------------------------------------
+  var ld = document.getElementById('lang-dots');
+  [['hello', 10], ['selamat', 50], ['2026', 90]].forEach(function (row) {
+    brailleDots(row[0], 128, row[1], 3.6, 9).forEach(function (p) { circle(ld, p[0], p[1], 1.4).setAttribute('fill', '#1B1F2A'); });
+  });
+
+  // ---- vector path to dots + pattern fill -----------------------------------
+  var path = document.getElementById('vector-line'), vd = document.getElementById('vector-dots');
+  var len = path.getTotalLength();
+  for (var s = 0; s <= len; s += 6) { var q = path.getPointAtLength(s); circle(vd, q.x, q.y, 1.7).setAttribute('fill', '#1B1F2A'); }
+  var fd = document.getElementById('fill-dots');
+  for (var fx = 0; fx < 6; fx++) for (var fy = 0; fy < 4; fy++) {
+    circle(fd, 228 + fx * 9 + (fy % 2) * 4.5, 78 + fy * 9, 1.6).setAttribute('fill', '#E2232F');
+  }
+
+  // ---- art: ripples of dots ---------------------------------------------------
+  var art = document.getElementById('art');
+  for (var ring = 1; ring <= 12; ring++) {
+    var rr = ring * 7.2, n = Math.max(6, Math.round(2 * Math.PI * rr / 4.2));
+    for (var a = 0; a < n; a++) {
+      var ang = a / n * 2 * Math.PI + ring * 0.21;
+      var wob = 1 + 0.05 * Math.sin(ang * 3 + ring);
+      var px = 100 + rr * wob * Math.cos(ang), py = 100 + rr * wob * Math.sin(ang);
+      if (px < 8 || px > 192 || py < 8 || py > 192) continue;
+      var c = circle(art, px, py, ring % 4 === 0 ? 1.55 : 1.05);
+      c.setAttribute('fill', ring === 4 ? '#E2232F' : '#1B1F2A');
+    }
+  }
+})();
+</script>
+</body>
+</html>
