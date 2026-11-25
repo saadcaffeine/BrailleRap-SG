@@ -8,6 +8,7 @@
 <meta property="og:title" content="BrailleRAP Singapore">
 <meta property="og:description" content="Open-source Braille embossers, built and supported in Singapore. Print from any phone over WiFi.">
 <meta property="og:type" content="website">
+<meta property="og:image" content="https://saadcaffeine.github.io/BrailleRap-SG/img/tactile-animals-1500.jpg">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 30'%3E%3Ccircle cx='5' cy='5' r='3.4' fill='%23E2232F'/%3E%3Ccircle cx='5' cy='15' r='3.4' fill='%231B1F2A'/%3E%3Ccircle cx='15' cy='5' r='3.4' fill='%231B1F2A'/%3E%3Ccircle cx='15' cy='25' r='3.4' fill='%231B1F2A'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +59,7 @@ p { margin: 0; max-width: var(--measure); }
   display: inline-flex; align-items: center; gap: .6rem;
   padding: .95rem 1.4rem; border-radius: 999px;
   background: var(--red); color: #fff; text-decoration: none;
-  font-weight: 600; font-size: 1.05rem; line-height: 1;
+  font-weight: 600; font-size: 1.05rem; line-height: 1.25;
   transition: background .15s ease;
 }
 .btn:hover { background: var(--red-ink); color: #fff; }
@@ -173,18 +174,26 @@ section { padding: clamp(4rem, 9vw, 7.5rem) 0; }
 @media (max-width: 760px) { .software .grid { grid-template-columns: 1fr; } }
 
 /* art */
-.art .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
-.artboard { background: var(--sheet); border-radius: 3px; aspect-ratio: 1; box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); }
-.artboard svg { width: 100%; height: 100%; }
+.art .wrap { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
 @media (max-width: 860px) { .art .wrap { grid-template-columns: 1fr; } }
 
+/* photos */
+.photo { margin: 0; display: grid; gap: .8rem; }
+.photo img { width: 100%; height: auto; border-radius: 3px; background: #d9dcd6; }
+.photo figcaption { font-size: .95rem; color: var(--graphite); max-width: 32rem; }
+.band-ink .photo figcaption { color: #AEB4C0; }
+.photo--art img { box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); }
+.btn--light { background: transparent; color: #F3F4F1; box-shadow: inset 0 0 0 1.5px #F3F4F1; margin-top: .4rem; }
+.btn--light:hover { background: #F3F4F1; color: var(--ink); }
+
 /* open */
-.open-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(2rem, 4vw, 3.5rem); margin: 0; }
+.open-grid { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: clamp(2.5rem, 6vw, 5.5rem); align-items: start; }
+@media (max-width: 860px) { .open-grid { grid-template-columns: 1fr; } }
+.open-list { display: grid; grid-template-columns: 1fr; gap: clamp(1.8rem, 3.5vw, 2.6rem); margin: 0; }
 .open-list > div { border-top: 2px solid var(--ink); padding-top: 1.2rem; display: grid; gap: .7rem; align-content: start; }
 .open-list dt { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.01em; line-height: 1.2; }
 .open-list dd { margin: 0; }
 .licence { margin-top: clamp(2.5rem, 5vw, 4rem); display: flex; flex-wrap: wrap; gap: 1rem 2.5rem; font-size: 1rem; color: var(--graphite); }
-@media (max-width: 860px) { .open-list { grid-template-columns: 1fr; } }
 
 /* order */
 .order { text-align: left; }
@@ -352,13 +361,16 @@ footer p { max-width: 60rem; }
 
   <section class="art band-ink" aria-labelledby="art-title">
     <div class="wrap">
-      <div class="artboard" role="img" aria-label="An embossed artwork: rings of raised dots spreading out from a point, like ripples on water.">
-        <svg id="art" viewBox="0 0 200 200" aria-hidden="true"></svg>
-      </div>
+      <figure class="photo photo--art">
+        <img src="img/tactile-animals-900.jpg" srcset="img/tactile-animals-900.jpg 900w, img/tactile-animals-1500.jpg 1500w" sizes="(max-width: 860px) 92vw, 34rem" width="900" height="1200" loading="lazy" decoding="async"
+             alt="A sheet held up to the light, embossed with raised-dot outlines of a giraffe, an elephant and a lion, each with a Braille label above it.">
+        <figcaption>A giraffe, an elephant and a lion, embossed with Braille labels.</figcaption>
+      </figure>
       <div class="section-head" style="margin:0">
         <h2 id="art-title">More than Braille.</h2>
         <p class="lede">A dot is a mark you can see and touch. Artists, designers and students use BrailleRAP to make tactile prints, patterns and illustrations: work meant to be read by hand as much as by eye.</p>
         <p class="muted">Every dot position is plain G-code, so you can also generate artwork with your own code and emboss it directly.</p>
+        <p><a class="btn btn--light" href="https://photos.app.goo.gl/xAvKrk52D5hEPUxS9">Watch it emboss (video)</a></p>
       </div>
     </div>
   </section>
@@ -369,11 +381,18 @@ footer p { max-width: 60rem; }
         <h2 id="open-title">Open source, from frame to firmware.</h2>
         <p class="lede">Every drawing, part file and line of code is published. That's what makes it practical to build and support here, rather than import.</p>
       </div>
+      <div class="open-grid">
+      <figure class="photo photo--machine">
+        <img src="img/machine-900.jpg" srcset="img/machine-900.jpg 900w, img/machine-1500.jpg 1500w" sizes="(max-width: 860px) 92vw, 30rem" width="900" height="1200" loading="lazy" decoding="async"
+             alt="End view of a BrailleRAP built in Singapore: a clear laser-cut acrylic case showing white and red 3D-printed parts, a hand knob printed with the BrailleRAP name, steel guide rods, the paper-feed stepper motor and its wiring.">
+        <figcaption>A BrailleRAP built in Singapore: laser-cut acrylic, 3D-printed parts and standard motors.</figcaption>
+      </figure>
       <dl class="open-list">
         <div><dt>Made locally</dt><dd>Laser-cut and 3D-printed parts with standard motors and electronics, fabricated and assembled in Singapore.</dd></div>
         <div><dt>Supported locally</dt><dd>Repairs, spare parts, setup and training from people nearby, not from an overseas service centre. Nothing is locked or proprietary.</dd></div>
         <div><dt>A fraction of the cost</dt><dd>An order of magnitude less than commercial Braille embossers, so a school or community group can afford more than one.</dd></div>
       </dl>
+      </div>
       <div class="licence">
         <span>Certified open hardware: <a href="https://certification.oshwa.org/fr000027.html">OSHWA FR000027</a></span>
         <span>Hardware licence: CERN-OHL-P v2</span>
@@ -523,19 +542,6 @@ footer p { max-width: 60rem; }
     circle(fd, 228 + fx * 9 + (fy % 2) * 4.5, 78 + fy * 9, 1.6).setAttribute('fill', '#E2232F');
   }
 
-  // ---- art: ripples of dots ---------------------------------------------------
-  var art = document.getElementById('art');
-  for (var ring = 1; ring <= 12; ring++) {
-    var rr = ring * 7.2, n = Math.max(6, Math.round(2 * Math.PI * rr / 4.2));
-    for (var a = 0; a < n; a++) {
-      var ang = a / n * 2 * Math.PI + ring * 0.21;
-      var wob = 1 + 0.05 * Math.sin(ang * 3 + ring);
-      var px = 100 + rr * wob * Math.cos(ang), py = 100 + rr * wob * Math.sin(ang);
-      if (px < 8 || px > 192 || py < 8 || py > 192) continue;
-      var c = circle(art, px, py, ring % 4 === 0 ? 1.55 : 1.05);
-      c.setAttribute('fill', ring === 4 ? '#E2232F' : '#1B1F2A');
-    }
-  }
 })();
 </script>
 </body>
