@@ -27,6 +27,9 @@ To build from it directly: `git clone -b xl-sg https://github.com/saadcaffeine/M
 
 ## Changes vs upstream
 
+> The configuration files and `xl-sg.patch` in this folder are from the first WiFi build. Later changes (SD support, paper sensor polarity, Y direction, paper-out and cancel handling, power-on self test) are in the firmware fork. For the current files, use [`xl-sg-v1.0.0`](https://github.com/saadcaffeine/MarlinBraille2/tree/xl-sg-v1.0.0).
+
+
 | File | Change | Why |
 |---|---|---|
 | `Configuration.h` | `DEFAULT_AXIS_STEPS_PER_UNIT { 80, 43.5, 400, 500 }` | Upstream `87/2` is integer division in C → **43**, ~1.2 % short on Y (≈5 mm over an A3 sheet). |
@@ -63,7 +66,7 @@ $pio = "$env:USERPROFILE\.platformio\penv\Scripts\pio.exe"
   two middle wires swapped (symptom: motor buzzes / jitters back and forth without turning).
 - **Endstops** (internal pull-ups, use signal + GND only):
   - X → `X-MIN` (IO33), switch **C + NC** (`X_MIN_ENDSTOP_INVERTING false`)
-  - Y → `Y-MIN` (IO32), switch **C + NO** (`Y_MIN_ENDSTOP_INVERTING true`)
+  - Y → `Y-MIN` (IO32) is the **paper sensor**, switch **C + NO** with `Y_MIN_ENDSTOP_INVERTING false`. `M119` shows `y_min: TRIGGERED` with **no paper** and `open` with a sheet at the lever. That's what the paper-loading routine expects: it feeds forward while triggered, then backs up to find the paper edge. Fixed in `aad810f`; before that, loading drove the sheet backwards.
   - Z-MIN is unused and reads `TRIGGERED` — harmless.
 - **Electromagnet:** heated-bed (HB) output. `M3 S255` = on, `M3 S0` = off.
 
@@ -80,6 +83,8 @@ $pio = "$env:USERPROFILE\.platformio\penv\Scripts\pio.exe"
   [ESP110]STA
   [ESP444]RESTART
   ```
+
+- **Optional on-device interface:** upload `braille.html.gz` from [BrailleRapSGUI](https://github.com/saadcaffeine/BrailleRapSGUI) to the same ESP3D flash as `index.html.gz`, then open `http://192.168.0.1/braille.html` from any phone or laptop. You get UEB grade 1 printing over WiFi via the SD card, status lights, progress, cancel and emergency stop. It needs `SDSUPPORT` in the firmware.
 
 ## Host software
 
