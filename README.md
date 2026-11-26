@@ -29,6 +29,9 @@ You may also find some interest in [OpenStreetTangible](https://github.com/brail
 This fork documents the Singapore BrailleRAP XL, running on an **MKS TinyBee v1.0** (ESP32) with WiFi through ESP3D.
 The firmware configuration, the changes from upstream, wiring notes and build/flash steps are in [`MarlinBraille2-TinyBee-XL/`](MarlinBraille2-TinyBee-XL/README.md).
 
+- **Firmware:** [saadcaffeine/MarlinBraille2](https://github.com/saadcaffeine/MarlinBraille2/tree/xl-sg), first stable version [`xl-sg-v1.0.0`](https://github.com/saadcaffeine/MarlinBraille2/releases/tag/xl-sg-v1.0.0).
+- **Optional on-device interface:** [BrailleRapSGUI](https://github.com/saadcaffeine/BrailleRapSGUI) is a print page served by the embosser over its own WiFi. Any phone, tablet or laptop can open `http://192.168.0.1/braille.html` to type English Braille (UEB grade 1), preview it and emboss. It also shows status lights and a staged progress bar, and has cancel and emergency stop. It's optional: AccessBrailleRAP and DesktopBrailleRAP work over USB as usual. The diagrams in its README show the job states and the layers from page to electronics.
+
 ## OSHWA Certification
 
 BrailleRAP is [OSHWA](https:oshwa.org) open source hardware certified.
