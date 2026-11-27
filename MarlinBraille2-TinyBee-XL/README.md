@@ -1,6 +1,6 @@
 # MarlinBraille2 — MKS TinyBee v1.0 / BrailleRAP XL (Singapore build)
 
-Firmware configuration for the Singapore BrailleRAP XL (A3, 297 × 420 mm) running on an
+Firmware configuration for the [Singapore BrailleRAP XL](https://saadcaffeine.github.io/BrailleRap-SG/) (A3, 297 × 420 mm) running on an
 **MKS TinyBee v1.0** (ESP32) with **TMC2209 standalone** drivers, with **ESP3D WiFi** enabled.
 
 Tested working 2026-11-25: USB control at 250000 baud, homing, endstops, and motor control
