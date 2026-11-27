@@ -22,11 +22,11 @@ BrailleRAP now exist in 2 different sizes: **BrailleRAP** and **BrailleRAP XL**.
 
 You may also find some interest in [OpenStreetTangible](https://github.com/braillerap/OpenStreetTangible), a tangible subway map of the Rennes city in France. A custom build to demonstrate the ability of OpenStreetTouch and BrailleRAP to build accessible map.
 
-**Website:** https://saadcaffeine.github.io/BrailleRap-SG/, the BrailleRAP Singapore product page (source on the [`gh-pages`](https://github.com/saadcaffeine/BrailleRap-SG/tree/gh-pages) branch).
+**Website:** [BrailleRAP Singapore](https://saadcaffeine.github.io/BrailleRap-SG/), the product page (source on the [`gh-pages`](https://github.com/saadcaffeine/BrailleRap-SG/tree/gh-pages) branch).
 
 ## Singapore build (BrailleRAP XL SG)
 
-This fork documents the Singapore BrailleRAP XL, running on an **MKS TinyBee v1.0** (ESP32) with WiFi through ESP3D.
+This fork documents the [Singapore BrailleRAP XL](https://saadcaffeine.github.io/BrailleRap-SG/), running on an **MKS TinyBee v1.0** (ESP32) with WiFi through ESP3D.
 The firmware configuration, the changes from upstream, wiring notes and build/flash steps are in [`MarlinBraille2-TinyBee-XL/`](MarlinBraille2-TinyBee-XL/README.md).
 
 - **Firmware:** [saadcaffeine/MarlinBraille2](https://github.com/saadcaffeine/MarlinBraille2/tree/xl-sg), first stable version [`xl-sg-v1.0.0`](https://github.com/saadcaffeine/MarlinBraille2/releases/tag/xl-sg-v1.0.0).
